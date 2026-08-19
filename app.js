@@ -2,11 +2,14 @@ const stage = document.querySelector('#stage');
 const screens = [...document.querySelectorAll('.screen')];
 const hero = document.querySelector('#hero');
 const detail = document.querySelector('#experience-detail');
+const detailTitle = document.querySelector('.experience__detail-title');
+const detailCopy = document.querySelector('.experience__detail-copy');
 const about = document.querySelector('#about');
 const aboutParagraph = document.querySelector('.about__body p');
 let current = 0;
 let transitioning = false;
 let aboutOffset = 0;
+let heroGestureProgress = 0;
 const ABOUT_SCROLL_DISTANCE = 3072;
 const aboutWords = aboutParagraph.textContent.trim().split(/\s+/);
 
@@ -33,8 +36,21 @@ const experiencePositions = {
   guardian: [814, 258]
 };
 
+const experienceNames = {
+  amini: 'Amini',
+  bluewaters: 'Blue Waters Products Ltd',
+  ey: 'Ernst and Young',
+  prestige: 'Prestige Holdings Limited',
+  guardian: 'Guardian Life'
+};
+
+const isMobileView = () => matchMedia('(max-width: 768px), (pointer: coarse)').matches;
+
 function fitStage() {
-  const scale = Math.min(innerWidth / 1440, innerHeight / 1024);
+  const mobile = matchMedia('(max-width: 768px), (pointer: coarse)').matches;
+  const width = mobile ? 402 : 1440;
+  const height = mobile ? 874 : 1024;
+  const scale = Math.min(innerWidth / width, innerHeight / height);
   stage.style.setProperty('--scale', scale);
 }
 
@@ -59,6 +75,79 @@ function updateAboutProgress() {
   });
   const backgroundProgress = Math.max(0, Math.min(1, (progress - .7) / .3));
   about.style.backgroundColor = mixColor([227,242,114], [14,17,23], backgroundProgress);
+}
+
+const heroParts = {
+  blob: document.querySelector('.hero__blob-wrap'),
+  portrait: document.querySelector('.hero__portrait-wrap'),
+  data: document.querySelector('.hero__role--data'),
+  web: document.querySelector('.hero__role--web'),
+  name: document.querySelector('.hero__name'),
+  location: document.querySelector('.hero__location')
+};
+
+function clamp(value, min = 0, max = 1) {
+  return Math.max(min, Math.min(max, value));
+}
+
+function renderHeroGesture(progress) {
+  heroGestureProgress = clamp(progress);
+  const p = heroGestureProgress;
+  hero.classList.remove('is-entering', 'is-exiting', 'is-returning');
+  hero.style.visibility = 'visible';
+  hero.style.opacity = '1';
+  hero.style.pointerEvents = p < .98 ? 'auto' : 'none';
+  about.style.visibility = 'visible';
+  about.style.opacity = String(clamp((p - .72) / .28));
+  about.style.pointerEvents = 'none';
+
+  heroParts.blob.style.transform = `translate(${462.228 * p}px, ${-184 * p}px) scale(${1 + 8.04 * p})`;
+  heroParts.portrait.style.transform = `translateY(${726.237 * p}px)`;
+  heroParts.data.style.transform = `translateX(${-415 * p}px)`;
+  heroParts.web.style.transform = `translateX(${537 * p}px)`;
+  heroParts.name.style.transform = `translateY(${-337 * p}px)`;
+  heroParts.location.style.transform = `translateX(${440 * p}px)`;
+  aboutParagraph.style.transform = `translateY(${200 * (1 - p)}px)`;
+  aboutParagraph.style.opacity = String(clamp((p - .72) / .28));
+}
+
+function clearHeroGestureStyles() {
+  Object.values(heroParts).forEach(part => { part.style.transform = ''; });
+  hero.style.visibility = '';
+  hero.style.opacity = '';
+  hero.style.pointerEvents = '';
+  about.style.visibility = '';
+  about.style.opacity = '';
+  about.style.pointerEvents = '';
+  aboutParagraph.style.transform = '';
+  aboutParagraph.style.opacity = '';
+}
+
+function settleHero(target, velocity = 0) {
+  const start = heroGestureProgress;
+  const distance = Math.abs(target - start);
+  const speed = Math.max(.75, Math.min(2.4, Math.abs(velocity) * 2.2));
+  const duration = Math.max(120, 520 * distance / speed);
+  const started = performance.now();
+  transitioning = true;
+  const tick = now => {
+    const t = clamp((now - started) / duration);
+    const eased = 1 - Math.pow(1 - t, 3);
+    renderHeroGesture(start + (target - start) * eased);
+    if (t < 1) requestAnimationFrame(tick);
+    else {
+      transitioning = false;
+      if (target === 1) {
+        clearHeroGestureStyles();
+        showAbout(0);
+      } else {
+        clearHeroGestureStyles();
+        show(0);
+        heroGestureProgress = 0;
+      }
+    }
+  };
+  requestAnimationFrame(tick);
 }
 
 function showAbout(progress = 0) {
@@ -130,20 +219,66 @@ addEventListener('wheel', event => {
   else up();
 }, { passive:false });
 
-let touchStartY = null;
-addEventListener('touchstart', event => { touchStartY = event.touches[0].clientY; }, { passive:true });
-addEventListener('touchend', event => {
-  if (touchStartY == null) return;
-  const distance = touchStartY - event.changedTouches[0].clientY;
-  if (Math.abs(distance) > 40) distance > 0 ? down() : up();
-  touchStartY = null;
+let touch = null;
+addEventListener('touchstart', event => {
+  if (transitioning || event.touches.length !== 1) return;
+  const y = event.touches[0].clientY;
+  touch = { startY:y, lastY:y, lastTime:performance.now(), velocity:0, startAbout:aboutOffset, startHero:heroGestureProgress };
+}, { passive:true });
+
+addEventListener('touchmove', event => {
+  if (!touch || event.touches.length !== 1) return;
+  const now = performance.now();
+  const y = event.touches[0].clientY;
+  const dt = Math.max(1, now - touch.lastTime);
+  touch.velocity = (touch.lastY - y) / dt;
+  touch.lastY = y;
+  touch.lastTime = now;
+  const upwardDistance = touch.startY - y;
+
+  if (current === 0) {
+    event.preventDefault();
+    renderHeroGesture(touch.startHero + upwardDistance / (innerHeight * .72));
+    return;
+  }
+
+  if (current === 1) {
+    event.preventDefault();
+    aboutOffset = clamp(touch.startAbout + upwardDistance * 5.2, 0, ABOUT_SCROLL_DISTANCE);
+    updateAboutProgress();
+    const reverseOverscroll = Math.max(0, y - touch.startY - touch.startAbout / 5.2);
+    if (reverseOverscroll > 0) {
+      heroGestureProgress = clamp(1 - reverseOverscroll / (innerHeight * .72));
+      renderHeroGesture(heroGestureProgress);
+    }
+  }
+}, { passive:false });
+
+addEventListener('touchend', () => {
+  if (!touch) return;
+  const velocity = touch.velocity;
+  if (current === 0) {
+    const target = heroGestureProgress > .28 || velocity > .45 ? 1 : 0;
+    settleHero(target, velocity);
+  } else if (current === 1) {
+    if (heroGestureProgress < .96) settleHero(0, velocity);
+    else if (aboutOffset >= ABOUT_SCROLL_DISTANCE - 2 && velocity > .18) aboutToExperience();
+  } else if (current === 2 && velocity < -.18) {
+    showAbout(1);
+  }
+  touch = null;
+}, { passive:true });
+
+addEventListener('touchcancel', () => {
+  if (current === 0 && heroGestureProgress > 0) settleHero(heroGestureProgress > .5 ? 1 : 0);
+  touch = null;
 }, { passive:true });
 
 document.querySelectorAll('[data-company]').forEach(link => {
   const reveal = () => {
     const company = link.dataset.company;
     const [left, top] = experiencePositions[company];
-    detail.textContent = `\n${experience[company]}`;
+    detailCopy.textContent = `\n${experience[company]}`;
     detail.style.left = `${left}px`;
     detail.style.top = `${top}px`;
     detail.classList.remove('is-visible');
@@ -152,6 +287,24 @@ document.querySelectorAll('[data-company]').forEach(link => {
   };
   link.addEventListener('mouseenter', reveal);
   link.addEventListener('focus', reveal);
+  link.addEventListener('click', event => {
+    if (!isMobileView()) return;
+    event.preventDefault();
+    const company = link.dataset.company;
+    detail.style.left = '';
+    detail.style.top = '';
+    detailTitle.textContent = experienceNames[company];
+    detailCopy.textContent = experience[company];
+    document.querySelector('#experience').classList.add('is-detail-mode');
+    detail.classList.remove('is-visible');
+    void detail.offsetWidth;
+    detail.classList.add('is-visible');
+  });
+});
+
+detailTitle.addEventListener('click', () => {
+  document.querySelector('#experience').classList.remove('is-detail-mode');
+  detail.classList.remove('is-visible');
 });
 
 fitStage();

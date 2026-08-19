@@ -92,6 +92,8 @@ a { color:inherit; }
 .experience__list a { position:absolute; left:0; width:max-content; color:#fff; font-size:32px; font-weight:100; line-height:normal; text-decoration:underline; }
 .experience__list a:nth-child(1){top:0}.experience__list a:nth-child(2){top:68px}.experience__list a:nth-child(3){top:137px}.experience__list a:nth-child(4){top:209px}.experience__list a:nth-child(5){top:278px}
 .experience__detail { position:absolute; left:814px; top:258px; width:445px; height:272px; color:#fff; white-space:pre-line; font:400 18px/normal "Archivo",sans-serif; letter-spacing:1.8px; }
+.experience__detail-title { display:none; }
+.experience__detail-copy { margin:0; white-space:pre-line; }
 .experience__detail.is-visible { animation:detailIn 2s linear both; }
 @keyframes detailIn {
   0% { opacity:.24; translate:0 200px; animation-timing-function:ease-out; }
@@ -102,3 +104,58 @@ a { color:inherit; }
 .socials a,.socials img { display:block; width:30.25px; height:30.25px; }
 
 @media (prefers-reduced-motion:reduce) { *,*::before,*::after { animation-duration:.01ms!important; animation-iteration-count:1!important; transition-duration:.01ms!important; } }
+
+@media (max-width: 768px), (pointer: coarse) {
+  :root { --mobile-width:402px; --mobile-height:874px; }
+  html,body { overscroll-behavior:none; touch-action:none; }
+  .stage { width:var(--mobile-width); height:var(--mobile-height); }
+  .screen { width:var(--mobile-width); height:var(--mobile-height); }
+  .hero { z-index:2; }
+  .about { z-index:1; }
+  .experience { z-index:3; }
+
+  .hero__blob-wrap { left:52px; top:155px; width:308px; height:348px; }
+  .hero__portrait-wrap { left:-22px; top:262px; width:446px; height:630px; }
+  .hero__portrait-wrap img { width:100%; height:139.19%; }
+  .hero__name { left:22px; top:28px; width:235px; height:64px; font-size:32.6px; }
+  .hero__name em { margin-left:82px; font-size:27px; }
+  .hero__location { left:202px; top:34px; width:173.4px; height:48.96px; scale:.98; transform-origin:center; }
+  .hero__location-icon { width:48.96px; height:48.96px; }
+  .hero__location-icon img { left:8px; top:4px; width:33px; height:41px; }
+  .hero__location-window { left:57.12px; top:13.6px; width:116.28px; height:25.84px; }
+  .hero__location-train { width:116.28px; height:51.68px; font-size:21.76px; line-height:25.84px; animation-name:locationTrainMobile; }
+  @keyframes locationTrainMobile {
+    0%,25% { transform:translateY(0); animation-timing-function:cubic-bezier(.68,-.55,.265,1.55); }
+    50%,75% { transform:translateY(-25.84px); animation-timing-function:cubic-bezier(.68,-.55,.265,1.55); }
+    100% { transform:translateY(0); }
+  }
+
+  .hero__role { text-shadow:0 2px 4px rgba(0,0,0,.88); }
+  .hero__role .eyebrow { margin-bottom:14px; font-size:16px; }
+  .hero__role h2 { margin-bottom:12px; font-size:17px; }
+  .hero__role > p:last-of-type { font-size:8.5px; }
+  .hero__role--data { left:7px; top:142px; width:195px; height:196px; }
+  .hero__role--web { left:199px; top:584px; width:205px; height:184px; }
+  .button { left:0; top:111px; width:58px; height:28px; border-radius:8px; font-size:7.5px; line-height:12px; }
+
+  .about__body { width:402px; min-height:874px; }
+  .about__body p { left:24px; top:112px; width:354px; height:auto; font-size:16px; line-height:23px; }
+
+  .experience header { left:24px; top:38px; width:354px; height:auto; font-size:28px; }
+  .experience header p { margin-bottom:38px; }
+  .experience header h2 { font-size:28px; }
+  .experience__list { left:24px; top:220px; }
+  .experience__list a { font-size:24px; }
+  .experience__list a:nth-child(1){top:0}.experience__list a:nth-child(2){top:68px}.experience__list a:nth-child(3){top:136px}.experience__list a:nth-child(4){top:204px}.experience__list a:nth-child(5){top:272px}
+  .experience__detail { display:none; left:24px; top:44px; width:354px; height:730px; font-size:14px; line-height:20px; letter-spacing:1.4px; }
+  .experience__detail-title { display:block; margin:0; padding:0; border:0; background:none; color:#fff; font:100 30px/34px "Archivo",sans-serif; text-decoration:underline; text-underline-position:from-font; cursor:pointer; }
+  .experience__detail-copy { position:absolute; left:0; top:76px; width:354px; margin:0; white-space:pre-line; }
+  .experience.is-detail-mode header,
+  .experience.is-detail-mode .experience__list { display:none; }
+  .experience.is-detail-mode .experience__detail { display:block; }
+  .experience.is-detail-mode .experience__detail.is-visible { animation:detailScreenIn .5s ease-out both; }
+  @keyframes detailScreenIn { from { opacity:.24; transform:translateY(400px); } to { opacity:1; transform:translateY(0); } }
+  .experience__waves { left:0; top:808px; width:402px; height:66px; }
+  .socials { left:24px; top:843.4px; width:348.52px; height:9.68px; }
+  .socials a,.socials img { width:9.68px; height:9.68px; }
+}
