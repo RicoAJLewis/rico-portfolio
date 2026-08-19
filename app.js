@@ -3,6 +3,7 @@ const screens = [...document.querySelectorAll('.screen')];
 const hero = document.querySelector('#hero');
 const detail = document.querySelector('#experience-detail');
 const detailTitle = document.querySelector('.experience__detail-title');
+const detailBack = document.querySelector('.experience__detail-back');
 const detailCopy = document.querySelector('.experience__detail-copy');
 const about = document.querySelector('#about');
 const aboutParagraph = document.querySelector('.about__body p');
@@ -264,7 +265,9 @@ addEventListener('touchend', () => {
     if (heroGestureProgress < .96) settleHero(0, velocity);
     else if (aboutOffset >= ABOUT_SCROLL_DISTANCE - 2 && velocity > .18) aboutToExperience();
   } else if (current === 2 && velocity < -.18) {
-    showAbout(1);
+    const experienceScreen = document.querySelector('#experience');
+    if (experienceScreen.classList.contains('is-detail-mode')) closeMobileDetail();
+    else showAbout(1);
   }
   touch = null;
 }, { passive:true });
@@ -302,10 +305,13 @@ document.querySelectorAll('[data-company]').forEach(link => {
   });
 });
 
-detailTitle.addEventListener('click', () => {
+function closeMobileDetail() {
   document.querySelector('#experience').classList.remove('is-detail-mode');
   detail.classList.remove('is-visible');
-});
+}
+
+detailTitle.addEventListener('click', closeMobileDetail);
+detailBack.addEventListener('click', closeMobileDetail);
 
 fitStage();
 setTimeout(() => hero.classList.remove('is-entering'), 501);

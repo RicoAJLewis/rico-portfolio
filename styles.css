@@ -93,6 +93,7 @@ a { color:inherit; }
 .experience__list a:nth-child(1){top:0}.experience__list a:nth-child(2){top:68px}.experience__list a:nth-child(3){top:137px}.experience__list a:nth-child(4){top:209px}.experience__list a:nth-child(5){top:278px}
 .experience__detail { position:absolute; left:814px; top:258px; width:445px; height:272px; color:#fff; white-space:pre-line; font:400 18px/normal "Archivo",sans-serif; letter-spacing:1.8px; }
 .experience__detail-title { display:none; }
+.experience__detail-back { display:none; }
 .experience__detail-copy { margin:0; white-space:pre-line; }
 .experience__detail.is-visible { animation:detailIn 2s linear both; }
 @keyframes detailIn {
@@ -148,6 +149,7 @@ a { color:inherit; }
   .experience__list a { font-size:24px; }
   .experience__list a:nth-child(1){top:0}.experience__list a:nth-child(2){top:68px}.experience__list a:nth-child(3){top:136px}.experience__list a:nth-child(4){top:204px}.experience__list a:nth-child(5){top:272px}
   .experience__detail { display:none; left:24px; top:44px; width:354px; height:730px; font-size:14px; line-height:20px; letter-spacing:1.4px; }
+  .experience__detail-back { position:absolute; right:0; top:-27px; display:block; padding:7px 10px; border:1px solid rgba(255,255,255,.7); border-radius:999px; background:rgba(111,115,120,.45); color:#fff; font:400 11px/14px "Archivo",sans-serif; letter-spacing:.4px; cursor:pointer; }
   .experience__detail-title { display:block; margin:0; padding:0; border:0; background:none; color:#fff; font:100 30px/34px "Archivo",sans-serif; text-decoration:underline; text-underline-position:from-font; cursor:pointer; }
   .experience__detail-copy { position:absolute; left:0; top:76px; width:354px; margin:0; white-space:pre-line; }
   .experience.is-detail-mode header,
