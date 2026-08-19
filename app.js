@@ -51,7 +51,7 @@ function fitStage() {
   const mobile = matchMedia('(max-width: 768px), (pointer: coarse)').matches;
   const width = mobile ? 402 : 1440;
   const height = mobile ? 874 : 1024;
-  const scale = Math.min(innerWidth / width, innerHeight / height);
+  const scale = Math.max(innerWidth / width, innerHeight / height);
   stage.style.setProperty('--scale', scale);
 }
 
