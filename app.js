@@ -7,6 +7,7 @@ const detailBack = document.querySelector('.experience__detail-back');
 const detailCopy = document.querySelector('.experience__detail-copy');
 const about = document.querySelector('#about');
 const aboutParagraph = document.querySelector('.about__body p');
+const scrollCue = document.querySelector('#scroll-cue');
 let current = 0;
 let transitioning = false;
 let aboutOffset = 0;
@@ -55,9 +56,16 @@ function fitStage() {
   stage.style.setProperty('--scale', scale);
 }
 
+function setViewportBackground(color) {
+  document.documentElement.style.backgroundColor = color;
+  document.body.style.backgroundColor = color;
+}
+
 function show(index) {
   current = Math.max(0, Math.min(2, index));
   screens.forEach((screen, i) => screen.classList.toggle('is-active', i === current));
+  scrollCue.classList.toggle('is-visible', current === 0);
+  setViewportBackground(current === 1 ? (about.style.backgroundColor || 'rgb(227,242,114)') : 'rgb(14,17,23)');
 }
 
 function mixColor(from, to, amount) {
@@ -75,7 +83,9 @@ function updateAboutProgress() {
     word.style.color = mixColor([124,77,255], [14,17,23], wordProgress);
   });
   const backgroundProgress = Math.max(0, Math.min(1, (progress - .7) / .3));
-  about.style.backgroundColor = mixColor([227,242,114], [14,17,23], backgroundProgress);
+  const aboutBackground = mixColor([227,242,114], [14,17,23], backgroundProgress);
+  about.style.backgroundColor = aboutBackground;
+  if (current === 1) setViewportBackground(aboutBackground);
 }
 
 const heroParts = {
@@ -94,6 +104,7 @@ function clamp(value, min = 0, max = 1) {
 function renderHeroGesture(progress) {
   heroGestureProgress = clamp(progress);
   const p = heroGestureProgress;
+  scrollCue.classList.toggle('is-visible', p < .03);
   hero.classList.remove('is-entering', 'is-exiting', 'is-returning');
   hero.style.visibility = 'visible';
   hero.style.opacity = '1';
@@ -176,6 +187,7 @@ function aboutToExperience() {
 function down() {
   if (transitioning) return;
   if (current === 0) {
+    scrollCue.classList.remove('is-visible');
     transitioning = true;
     hero.classList.remove('is-entering', 'is-returning');
     hero.classList.add('is-exiting');
@@ -312,6 +324,7 @@ function closeMobileDetail() {
 
 detailTitle.addEventListener('click', closeMobileDetail);
 detailBack.addEventListener('click', closeMobileDetail);
+scrollCue.addEventListener('click', down);
 
 fitStage();
 setTimeout(() => hero.classList.remove('is-entering'), 501);

@@ -104,6 +104,12 @@ a { color:inherit; }
 .socials { position:absolute; left:192px; top:918px; width:1089.125px; height:20.25px; display:flex; align-items:center; justify-content:space-between; }
 .socials a,.socials img { display:block; width:30.25px; height:30.25px; }
 
+.scroll-cue { position:absolute; z-index:20; left:50%; bottom:24px; display:flex; min-width:112px; height:48px; padding:6px 18px; border:1px solid rgba(227,242,114,.8); border-radius:999px; align-items:center; justify-content:center; gap:10px; background:rgba(14,17,23,.78); box-shadow:0 8px 24px rgba(0,0,0,.3); color:#fff; opacity:0; pointer-events:none; transform:translate(-50%,16px); transition:opacity .25s ease,transform .25s ease; font:400 14px/1 "Archivo Black",sans-serif; letter-spacing:.8px; }
+.scroll-cue.is-visible { opacity:1; pointer-events:auto; transform:translate(-50%,0); }
+.scroll-cue__mobile { display:none; }
+.scroll-cue__arrow { color:var(--pink); font-size:24px; line-height:12px; animation:scrollCueBounce 1.25s ease-in-out infinite; }
+@keyframes scrollCueBounce { 0%,100%{transform:translateY(-2px)} 50%{transform:translateY(3px)} }
+
 @media (prefers-reduced-motion:reduce) { *,*::before,*::after { animation-duration:.01ms!important; animation-iteration-count:1!important; transition-duration:.01ms!important; } }
 
 @media (max-width: 768px), (pointer: coarse) {
@@ -160,4 +166,8 @@ a { color:inherit; }
   .experience__waves { left:0; top:808px; width:402px; height:66px; }
   .socials { left:24px; top:843.4px; width:348.52px; height:9.68px; }
   .socials a,.socials img { width:9.68px; height:9.68px; }
+  .scroll-cue { bottom:16px; min-width:102px; height:38px; padding:5px 13px; gap:7px; border-color:rgba(227,242,114,.9); background:rgba(14,17,23,.72); font-size:10px; letter-spacing:.5px; }
+  .scroll-cue__desktop { display:none; }
+  .scroll-cue__mobile { display:inline; }
+  .scroll-cue__arrow { font-size:19px; }
 }
