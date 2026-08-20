@@ -81,6 +81,19 @@ a { color:inherit; }
 .about__body p { position:absolute; left:80px; top:285px; width:calc(100% - 160px); height:372px; margin:0; text-align:center; font:400 16px/62px "Archivo Black",sans-serif; }
 .about__word { color:#7c4dff; }
 @keyframes aboutContentIn { 0%{opacity:0;transform:translateY(200px)} 100%{opacity:1;transform:translateY(0)} }
+.about__night-scene { position:absolute; z-index:3; inset:0; overflow:hidden; pointer-events:none; visibility:hidden; }
+.about.is-night .about__night-scene { visibility:visible; }
+.rico-sprite { position:absolute; z-index:2; left:-210px; bottom:26px; width:181px; height:362px; opacity:0; overflow:hidden; clip-path:inset(0 0 0 5%); background:url("assets/rico-flashlight-sprite.png") 0 0/600% 100% no-repeat; image-rendering:auto; }
+.about.is-night .rico-sprite { animation:ricoSpriteCycle .72s steps(5) infinite,ricoSpriteEnter 3.2s cubic-bezier(.18,.78,.2,1) forwards; }
+.about.is-night.is-sprite-settled .rico-sprite { left:var(--sprite-stop-left,calc(50% - 90.5px)); bottom:var(--sprite-stop-bottom,82px); opacity:1; animation:none; clip-path:none; background-image:url("assets/rico-flashlight-front-still.png"); background-size:100% 100%; background-position:center; }
+.about.is-night.is-sprite-exiting .rico-sprite { opacity:1; animation:none; clip-path:inset(0 0 0 5%); background-image:url("assets/rico-flashlight-sprite.png"); background-size:600% 100%; }
+.flashlight-beam { position:absolute; z-index:1; left:0; top:0; width:0; height:150px; opacity:0; transform-origin:left center; clip-path:polygon(0 46%,100% 0,100% 100%,0 54%); background:radial-gradient(ellipse at 0 50%,rgba(255,255,224,.74) 0,rgba(227,242,114,.38) 31%,rgba(227,242,114,.12) 57%,transparent 78%); filter:blur(2px); mix-blend-mode:screen; will-change:left,top,width,transform; }
+.about.is-night .flashlight-beam { animation:flashlightOn 3.2s ease-out forwards; }
+.about.is-night.is-sprite-exiting .flashlight-beam { opacity:1; animation:none; }
+.about-scroll-cue { z-index:6; left:75%; bottom:24px; }
+@keyframes ricoSpriteCycle { from{background-position:0 0} to{background-position:100% 0} }
+@keyframes ricoSpriteEnter { 0%{left:-210px;bottom:26px;opacity:0} 8%{opacity:1} 100%{left:var(--sprite-stop-left,calc(50% - 90.5px));bottom:var(--sprite-stop-bottom,82px);opacity:1} }
+@keyframes flashlightOn { 0%,62%{opacity:0} 76%{opacity:.2} 100%{opacity:1} }
 
 .experience { background:var(--dark); }
 .experience.is-entering { animation:experienceIn .6s ease-out both; }
@@ -147,6 +160,12 @@ a { color:inherit; }
 
   .about__body { width:100%; min-height:874px; }
   .about__body p { left:24px; top:112px; width:calc(100% - 48px); height:auto; font-size:16px; line-height:23px; }
+  .rico-sprite { left:-120px; bottom:28px; width:104px; height:208px; }
+  .about.is-night .rico-sprite { animation-duration:.66s,2.7s; }
+  .about.is-night.is-sprite-settled .rico-sprite { left:var(--sprite-stop-left,calc(72% - 52px)); bottom:var(--sprite-stop-bottom,70px); }
+  .flashlight-beam { height:96px; }
+  .about-scroll-cue { left:72%; bottom:14px; }
+  @keyframes ricoSpriteEnter { 0%{left:-120px;bottom:28px;opacity:0} 8%{opacity:1} 100%{left:var(--sprite-stop-left,calc(72% - 52px));bottom:var(--sprite-stop-bottom,70px);opacity:1} }
 
   .experience header { left:24px; top:38px; width:calc(100% - 48px); height:auto; font-size:28px; }
   .experience header p { margin-bottom:38px; }

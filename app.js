@@ -8,12 +8,19 @@ const detailCopy = document.querySelector('.experience__detail-copy');
 const about = document.querySelector('#about');
 const aboutParagraph = document.querySelector('.about__body p');
 const scrollCue = document.querySelector('#scroll-cue');
+const aboutScrollCue = document.querySelector('#about-scroll-cue');
+const ricoSprite = document.querySelector('.rico-sprite');
+const flashlightBeam = document.querySelector('.flashlight-beam');
 let current = 0;
 let transitioning = false;
 let aboutOffset = 0;
 let heroGestureProgress = 0;
+let nightAnimationStart = 0;
+let nightTrackingFrame = 0;
+let previousAboutProgress = 0;
 const ABOUT_SCROLL_DISTANCE = 3072;
 const aboutWords = aboutParagraph.textContent.trim().split(/\s+/);
+const flashlightAnchors = [[.94,.56],[.95,.58],[.88,.58],[.94,.57],[.95,.57],[.87,.58]];
 
 aboutParagraph.replaceChildren(...aboutWords.flatMap((word, index) => {
   const span = document.createElement('span');
@@ -55,6 +62,7 @@ function fitStage() {
   const width = innerWidth / scale;
   stage.style.setProperty('--scale', scale);
   stage.style.setProperty('--stage-width', `${width}px`);
+  if (about.classList.contains('is-night')) requestAnimationFrame(setNightStopPosition);
 }
 
 function setViewportBackground(color) {
@@ -76,6 +84,7 @@ function mixColor(from, to, amount) {
 
 function updateAboutProgress() {
   const progress = Math.max(0, Math.min(1, aboutOffset / ABOUT_SCROLL_DISTANCE));
+  const movingBack = progress < previousAboutProgress - .0005;
   const words = document.querySelectorAll('.about__word');
   words.forEach((word, index) => {
     const start = index / words.length;
@@ -86,7 +95,127 @@ function updateAboutProgress() {
   const backgroundProgress = Math.max(0, Math.min(1, (progress - .7) / .3));
   const aboutBackground = mixColor([227,242,114], [14,17,23], backgroundProgress);
   about.style.backgroundColor = aboutBackground;
+  const nightWasActive = about.classList.contains('is-night');
+  const nightIsActive = progress >= .72;
+  about.classList.toggle('is-night', nightIsActive);
+  if (nightIsActive && (!nightWasActive || !nightTrackingFrame)) startNightScene();
+  if (nightIsActive && movingBack && progress < .9) renderNightExit(progress);
+  if (nightIsActive && about.classList.contains('is-sprite-exiting') && !movingBack) {
+    if (progress >= .9) settleNightScene();
+    else renderNightExit(progress);
+  }
+  if (!nightIsActive && nightWasActive) resetNightScene();
+  aboutScrollCue.classList.toggle('is-visible', current === 1 && progress >= .9);
   if (current === 1) setViewportBackground(aboutBackground);
+  previousAboutProgress = progress;
+}
+
+function startNightScene() {
+  about.classList.remove('is-sprite-settled', 'is-sprite-exiting');
+  clearSpriteOverrides();
+  setNightStopPosition();
+  nightAnimationStart = performance.now();
+  cancelAnimationFrame(nightTrackingFrame);
+  nightTrackingFrame = requestAnimationFrame(trackFlashlight);
+}
+
+function resetNightScene() {
+  cancelAnimationFrame(nightTrackingFrame);
+  nightTrackingFrame = 0;
+  about.classList.remove('is-sprite-settled', 'is-sprite-exiting');
+  clearSpriteOverrides();
+  flashlightBeam.removeAttribute('style');
+}
+
+function clearSpriteOverrides() {
+  ricoSprite.style.removeProperty('left');
+  ricoSprite.style.removeProperty('bottom');
+  ricoSprite.style.removeProperty('background-position');
+  delete ricoSprite.dataset.frame;
+}
+
+function settleNightScene() {
+  about.classList.remove('is-sprite-exiting');
+  about.classList.add('is-sprite-settled');
+  clearSpriteOverrides();
+  setNightStopPosition();
+}
+
+function getNightStopPosition() {
+  const mobile = isMobileView();
+  const logicalHeight = mobile ? 874 : 1024;
+  const aboutRect = about.getBoundingClientRect();
+  const cueRect = aboutScrollCue.getBoundingClientRect();
+  const scale = aboutRect.height / logicalHeight;
+  const spriteWidth = mobile ? 104 : 181;
+  const cueCenter = (cueRect.left + cueRect.width / 2 - aboutRect.left) / scale;
+  const cueTop = (cueRect.top - aboutRect.top) / scale;
+  const stopGap = mobile ? 16 : 18;
+  return {
+    left: cueCenter - spriteWidth / 2,
+    bottom: logicalHeight - cueTop + stopGap
+  };
+}
+
+function setNightStopPosition() {
+  const stop = getNightStopPosition();
+  ricoSprite.style.setProperty('--sprite-stop-left', `${stop.left}px`);
+  ricoSprite.style.setProperty('--sprite-stop-bottom', `${stop.bottom}px`);
+}
+
+function renderNightExit(progress) {
+  const mobile = isMobileView();
+  const spriteWidth = mobile ? 104 : 181;
+  const stop = getNightStopPosition();
+  const startLeft = stop.left;
+  const endLeft = -spriteWidth - 18;
+  const startBottom = stop.bottom;
+  const endBottom = mobile ? 28 : 26;
+  const exitProgress = clamp((.9 - progress) / .18);
+  const frame = 5 - (Math.floor(exitProgress * 18) % flashlightAnchors.length);
+
+  about.classList.remove('is-sprite-settled');
+  about.classList.add('is-sprite-exiting');
+  ricoSprite.style.left = `${startLeft + (endLeft - startLeft) * exitProgress}px`;
+  ricoSprite.style.bottom = `${startBottom + (endBottom - startBottom) * exitProgress}px`;
+  ricoSprite.style.backgroundPosition = `${frame / (flashlightAnchors.length - 1) * 100}% 0`;
+  ricoSprite.dataset.frame = String(frame);
+}
+
+function trackFlashlight(now) {
+  if (!about.classList.contains('is-night') || current !== 1) {
+    nightTrackingFrame = 0;
+    return;
+  }
+  const mobile = isMobileView();
+  const entranceDuration = mobile ? 2700 : 3200;
+  const cycleDuration = mobile ? 660 : 720;
+  const elapsed = Math.max(0, now - nightAnimationStart);
+  const settled = elapsed >= entranceDuration;
+  if (settled && !about.classList.contains('is-sprite-exiting')) settleNightScene();
+
+  const exiting = about.classList.contains('is-sprite-exiting');
+  const frame = exiting ? Number(ricoSprite.dataset.frame || 0) : settled ? 0 : Math.floor((elapsed % cycleDuration) / cycleDuration * flashlightAnchors.length);
+  const anchor = settled && !exiting ? [.76,.66] : flashlightAnchors[frame];
+  const spriteRect = ricoSprite.getBoundingClientRect();
+  const cueRect = aboutScrollCue.getBoundingClientRect();
+  const aboutRect = about.getBoundingClientRect();
+  const logicalHeight = mobile ? 874 : 1024;
+  const scale = aboutRect.height / logicalHeight;
+  const startX = spriteRect.left + spriteRect.width * anchor[0];
+  const startY = spriteRect.top + spriteRect.height * anchor[1];
+  const targetX = cueRect.left + cueRect.width / 2;
+  const targetY = cueRect.top + cueRect.height / 2;
+  const dx = targetX - startX;
+  const dy = targetY - startY;
+  const beamHeight = mobile ? 96 : 150;
+
+  flashlightBeam.style.left = `${(startX - aboutRect.left) / scale}px`;
+  flashlightBeam.style.top = `${(startY - aboutRect.top) / scale - beamHeight / 2}px`;
+  flashlightBeam.style.width = `${Math.hypot(dx, dy) / scale}px`;
+  flashlightBeam.style.height = `${beamHeight}px`;
+  flashlightBeam.style.transform = `rotate(${Math.atan2(dy, dx)}rad)`;
+  nightTrackingFrame = requestAnimationFrame(trackFlashlight);
 }
 
 const heroParts = {
@@ -328,6 +457,7 @@ function closeMobileDetail() {
 detailTitle.addEventListener('click', closeMobileDetail);
 detailBack.addEventListener('click', closeMobileDetail);
 scrollCue.addEventListener('click', down);
+aboutScrollCue.addEventListener('click', aboutToExperience);
 
 fitStage();
 setTimeout(() => hero.classList.remove('is-entering'), 501);
