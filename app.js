@@ -314,6 +314,14 @@ function aboutToExperience() {
   }, 600);
 }
 
+function triggerBoundaryBounce(edge) {
+  const className = edge === 'top' ? 'is-bouncing-top' : 'is-bouncing-bottom';
+  stage.classList.remove('is-bouncing-top', 'is-bouncing-bottom');
+  void stage.offsetWidth;
+  stage.classList.add(className);
+  setTimeout(() => stage.classList.remove(className), 470);
+}
+
 function down() {
   if (transitioning) return;
   if (current === 0) {
@@ -323,10 +331,12 @@ function down() {
     hero.classList.add('is-exiting');
     setTimeout(() => { showAbout(0); transitioning = false; }, 2000);
   } else if (current === 1) aboutToExperience();
+  else triggerBoundaryBounce('bottom');
 }
 
 function up() {
-  if (transitioning || current === 0) return;
+  if (transitioning) return;
+  if (current === 0) { triggerBoundaryBounce('top'); return; }
   if (current === 2) { showAbout(1); return; }
   transitioning = true;
   show(0);
@@ -401,15 +411,21 @@ addEventListener('touchend', () => {
   if (!touch) return;
   const velocity = touch.velocity;
   if (current === 0) {
-    const target = heroGestureProgress > .28 || velocity > .45 ? 1 : 0;
-    settleHero(target, velocity);
+    if (touch.startHero <= .01 && heroGestureProgress <= .01 && velocity < -.12) triggerBoundaryBounce('top');
+    else {
+      const target = heroGestureProgress > .28 || velocity > .45 ? 1 : 0;
+      settleHero(target, velocity);
+    }
   } else if (current === 1) {
     if (heroGestureProgress < .96) settleHero(0, velocity);
     else if (aboutOffset >= ABOUT_SCROLL_DISTANCE - 2 && velocity > .18) aboutToExperience();
-  } else if (current === 2 && velocity < -.18) {
-    const experienceScreen = document.querySelector('#experience');
-    if (experienceScreen.classList.contains('is-detail-mode')) closeMobileDetail();
-    else showAbout(1);
+  } else if (current === 2) {
+    if (velocity > .18) triggerBoundaryBounce('bottom');
+    else if (velocity < -.18) {
+      const experienceScreen = document.querySelector('#experience');
+      if (experienceScreen.classList.contains('is-detail-mode')) closeMobileDetail();
+      else showAbout(1);
+    }
   }
   touch = null;
 }, { passive:true });
