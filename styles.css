@@ -89,7 +89,7 @@ a { color:inherit; }
 .experience header p { margin:0 0 74px; font-weight:100; line-height:normal; }
 .experience header h2 { margin:0; font:400 32px/normal "Archivo Black",sans-serif; }
 .experience__list { position:absolute; left:85px; top:250px; display:block; }
-.experience__list a { position:absolute; left:0; width:max-content; color:#fff; font-size:32px; font-weight:100; line-height:normal; text-decoration:underline; }
+.experience__list a { position:absolute; left:0; width:max-content; color:#fff; font-size:32px; font-weight:100; line-height:normal; text-decoration:none; }
 .experience__list a:nth-child(1){top:0}.experience__list a:nth-child(2){top:68px}.experience__list a:nth-child(3){top:137px}.experience__list a:nth-child(4){top:209px}.experience__list a:nth-child(5){top:278px}
 .experience__detail { position:absolute; left:814px; top:258px; width:445px; height:272px; color:#fff; white-space:pre-line; font:400 18px/normal "Archivo",sans-serif; letter-spacing:1.8px; }
 .experience__detail-title { display:none; }
@@ -126,14 +126,14 @@ a { color:inherit; }
   .hero__portrait-wrap img { width:100%; height:139.19%; }
   .hero__name { left:22px; top:28px; width:235px; height:64px; font-size:32.6px; }
   .hero__name em { margin-left:82px; font-size:27px; }
-  .hero__location { left:202px; top:34px; width:173.4px; height:48.96px; scale:.98; transform-origin:center; }
+  .hero__location { left:211px; top:21px; width:173.4px; height:48.96px; scale:.98; transform-origin:center; }
   .hero__location-icon { width:48.96px; height:48.96px; }
-  .hero__location-icon img { left:8px; top:4px; width:33px; height:41px; }
-  .hero__location-window { left:57.12px; top:13.6px; width:116.28px; height:25.84px; }
-  .hero__location-train { width:116.28px; height:51.68px; font-size:21.76px; line-height:25.84px; animation-name:locationTrainMobile; }
+  .hero__location-icon img { left:10.5px; top:7.5px; width:28px; height:35px; }
+  .hero__location-window { left:57.12px; top:13.6px; width:116.28px; height:24.2px; }
+  .hero__location-train { width:116.28px; height:48.4px; font-size:20.5px; line-height:24.2px; animation-name:locationTrainMobile; }
   @keyframes locationTrainMobile {
     0%,25% { transform:translateY(0); animation-timing-function:cubic-bezier(.68,-.55,.265,1.55); }
-    50%,75% { transform:translateY(-25.84px); animation-timing-function:cubic-bezier(.68,-.55,.265,1.55); }
+    50%,75% { transform:translateY(-24.2px); animation-timing-function:cubic-bezier(.68,-.55,.265,1.55); }
     100% { transform:translateY(0); }
   }
 
@@ -156,7 +156,7 @@ a { color:inherit; }
   .experience__list a:nth-child(1){top:0}.experience__list a:nth-child(2){top:68px}.experience__list a:nth-child(3){top:136px}.experience__list a:nth-child(4){top:204px}.experience__list a:nth-child(5){top:272px}
   .experience__detail { display:none; left:24px; top:44px; width:354px; height:730px; font-size:14px; line-height:20px; letter-spacing:1.4px; }
   .experience__detail-back { position:absolute; right:0; top:-27px; display:block; padding:7px 10px; border:1px solid rgba(255,255,255,.7); border-radius:999px; background:rgba(111,115,120,.45); color:#fff; font:400 11px/14px "Archivo",sans-serif; letter-spacing:.4px; cursor:pointer; }
-  .experience__detail-title { display:block; margin:0; padding:0; border:0; background:none; color:#fff; font:100 30px/34px "Archivo",sans-serif; text-decoration:underline; text-underline-position:from-font; cursor:pointer; }
+  .experience__detail-title { display:block; margin:0; padding:0; border:0; background:none; color:#fff; font:100 30px/34px "Archivo",sans-serif; text-decoration:none; cursor:pointer; }
   .experience__detail-copy { position:absolute; left:0; top:76px; width:354px; margin:0; white-space:pre-line; }
   .experience.is-detail-mode header,
   .experience.is-detail-mode .experience__list { display:none; }
@@ -164,8 +164,8 @@ a { color:inherit; }
   .experience.is-detail-mode .experience__detail.is-visible { animation:detailScreenIn .5s ease-out both; }
   @keyframes detailScreenIn { from { opacity:.24; transform:translateY(400px); } to { opacity:1; transform:translateY(0); } }
   .experience__waves { left:0; top:808px; width:402px; height:66px; }
-  .socials { left:24px; top:843.4px; width:348.52px; height:9.68px; }
-  .socials a,.socials img { width:9.68px; height:9.68px; }
+  .socials { left:24px; top:837.9px; width:348.52px; height:20.68px; }
+  .socials a,.socials img { width:20.68px; height:20.68px; }
   .scroll-cue { bottom:16px; min-width:102px; height:38px; padding:5px 13px; gap:7px; border-color:rgba(227,242,114,.9); background:rgba(14,17,23,.72); font-size:10px; letter-spacing:.5px; }
   .scroll-cue__desktop { display:none; }
   .scroll-cue__mobile { display:inline; }
