@@ -53,15 +53,32 @@ const experienceNames = {
   guardian: 'Guardian Life'
 };
 
-const isMobileView = () => matchMedia('(max-width: 768px), (pointer: coarse)').matches;
+const MOBILE_LAYOUT_QUERY = '(max-width: 768px), (max-height: 600px) and (pointer: coarse)';
+const MOBILE_HEIGHT = 874;
+
+const isMobileView = () => matchMedia(MOBILE_LAYOUT_QUERY).matches;
+
+function getVisibleViewport() {
+  return {
+    width: visualViewport?.width || document.documentElement.clientWidth || innerWidth,
+    height: visualViewport?.height || document.documentElement.clientHeight || innerHeight
+  };
+}
 
 function fitStage() {
-  const mobile = matchMedia('(max-width: 768px), (pointer: coarse)').matches;
-  const height = mobile ? 874 : 1024;
-  const scale = innerHeight / height;
-  const width = innerWidth / scale;
+  const mobile = isMobileView();
+  const viewport = getVisibleViewport();
+  const height = mobile ? MOBILE_HEIGHT : 1024;
+  const scale = mobile
+    ? Math.min(1, viewport.width / 360, viewport.height / MOBILE_HEIGHT)
+    : viewport.height / height;
+  const width = viewport.width / scale;
+  const renderedWidth = width * scale;
+  const renderedHeight = height * scale;
   stage.style.setProperty('--scale', scale);
   stage.style.setProperty('--stage-width', `${width}px`);
+  stage.style.left = `${Math.max(0, (viewport.width - renderedWidth) / 2)}px`;
+  stage.style.top = `${Math.max(0, (viewport.height - renderedHeight) / 2)}px`;
   if (about.classList.contains('is-night')) requestAnimationFrame(setNightStopPosition);
 }
 
@@ -350,6 +367,7 @@ function up() {
 }
 
 addEventListener('resize', fitStage);
+visualViewport?.addEventListener('resize', fitStage);
 addEventListener('keydown', event => {
   if (event.key === 'ArrowDown') { event.preventDefault(); down(); }
   if (event.key === 'ArrowUp') { event.preventDefault(); up(); }
