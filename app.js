@@ -50,10 +50,11 @@ const isMobileView = () => matchMedia('(max-width: 768px), (pointer: coarse)').m
 
 function fitStage() {
   const mobile = matchMedia('(max-width: 768px), (pointer: coarse)').matches;
-  const width = mobile ? 402 : 1440;
   const height = mobile ? 874 : 1024;
-  const scale = Math.min(innerWidth / width, innerHeight / height);
+  const scale = innerHeight / height;
+  const width = innerWidth / scale;
   stage.style.setProperty('--scale', scale);
+  stage.style.setProperty('--stage-width', `${width}px`);
 }
 
 function setViewportBackground(color) {
@@ -294,7 +295,8 @@ document.querySelectorAll('[data-company]').forEach(link => {
     const company = link.dataset.company;
     const [left, top] = experiencePositions[company];
     detailCopy.textContent = `\n${experience[company]}`;
-    detail.style.left = `${left}px`;
+    detail.style.left = '';
+    detail.style.right = `${1440 - left - 445}px`;
     detail.style.top = `${top}px`;
     detail.classList.remove('is-visible');
     void detail.offsetWidth;
@@ -307,6 +309,7 @@ document.querySelectorAll('[data-company]').forEach(link => {
     event.preventDefault();
     const company = link.dataset.company;
     detail.style.left = '';
+    detail.style.right = '';
     detail.style.top = '';
     detailTitle.textContent = experienceNames[company];
     detailCopy.textContent = experience[company];
